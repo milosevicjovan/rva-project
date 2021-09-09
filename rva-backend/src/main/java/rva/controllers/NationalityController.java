@@ -3,12 +3,12 @@ package rva.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.function.EntityResponse;
 import rva.jpa.Nationality;
 import rva.repositories.NationalityRepository;
+import rva.repositories.PlayerRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 
@@ -16,47 +16,53 @@ import java.util.List;
 public class NationalityController {
 
     @Autowired
-    private NationalityRepository repository;
+    private NationalityRepository nationalityRepository;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @GetMapping("nationalities/all")
     public List<Nationality> getNationalitiesAll() {
-        return repository.findAll();
+        return nationalityRepository.findAll();
     }
 
     @GetMapping("nationalities/{id}")
     public Nationality getNationalityById(@PathVariable("id") Integer id) {
-        return repository.getById(id);
+        return nationalityRepository.getById(id);
     }
 
     @GetMapping("nationalities/search/{name}")
     public List<Nationality> getNationalitiesByName(@PathVariable("name") String name) {
-        return repository.findByNameContainingIgnoreCase(name);
+        return nationalityRepository.findByNameContainingIgnoreCase(name);
     }
 
     @PostMapping("nationalities/insert")
     public ResponseEntity<Nationality> insertNationality(@RequestBody Nationality nationality) {
-        if (repository.existsById(nationality.getId())) {
+        if (nationalityRepository.existsById(nationality.getId())) {
             return new ResponseEntity<Nationality>(HttpStatus.CONFLICT);
         }
-        repository.save(nationality);
+        nationalityRepository.save(nationality);
         return new ResponseEntity<Nationality>(HttpStatus.OK);
     }
 
     @PutMapping("nationalities/update")
     public ResponseEntity<Nationality> updateNationality(@RequestBody Nationality nationality) {
-        if (!repository.existsById(nationality.getId())) {
+        if (!nationalityRepository.existsById(nationality.getId())) {
             return new ResponseEntity<Nationality>(HttpStatus.NO_CONTENT);
         }
-        repository.save(nationality);
+        nationalityRepository.save(nationality);
         return new ResponseEntity<Nationality>(HttpStatus.OK);
     }
 
+    @Transactional
     @DeleteMapping("nationalities/{id}/delete")
     public ResponseEntity<Nationality> deleteNationality(@PathVariable("id") Integer id) {
-        if (!repository.existsById(id)) {
+        if (!nationalityRepository.existsById(id)) {
             return new ResponseEntity<Nationality>(HttpStatus.NO_CONTENT);
         }
-        repository.deleteById(id);
+        // First delete all players with forwarded nationality.
+        playerRepository.deleteAllByNationality_Id(id);
+        nationalityRepository.deleteById(id);
         return new ResponseEntity<Nationality>(HttpStatus.OK);
     }
 }

@@ -13,49 +13,49 @@ import java.util.List;
 public class PlayerController {
 
     @Autowired
-    private PlayerRepository repository;
+    private PlayerRepository playerRepository;
 
     @GetMapping("players/all")
     public List<Player> getPlayersAll() {
-        return repository.findAll();
+        return playerRepository.findAll();
     }
 
     @GetMapping("players/{id}")
     public Player getPlayerById(@PathVariable("id") Integer id) {
-        return repository.getById(id);
+        return playerRepository.getById(id);
     }
 
     // Search example: http://localhost:8083/players/search?firstName=Cris&lastName=Ron
     @GetMapping("players/search")
     public List<Player> getPlayersByName(String firstName, String lastName) {
-        return repository
+        return playerRepository
                 .findByFirstNameContainingAndLastNameContainingIgnoreCase(firstName, lastName);
     }
 
     @PostMapping("players/insert")
     public ResponseEntity<Player> insertPlayer(@RequestBody Player player) {
-        if (repository.existsById(player.getId())) {
+        if (playerRepository.existsById(player.getId())) {
             return new ResponseEntity<Player>(HttpStatus.CONFLICT);
         }
-        repository.save(player);
+        playerRepository.save(player);
         return new ResponseEntity<Player>(HttpStatus.OK);
     }
 
     @PutMapping("players/update")
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
-        if (!repository.existsById(player.getId())) {
+        if (!playerRepository.existsById(player.getId())) {
             return new ResponseEntity<Player>(HttpStatus.NO_CONTENT);
         }
-        repository.save(player);
+        playerRepository.save(player);
         return new ResponseEntity<Player>(HttpStatus.OK);
     }
 
     @DeleteMapping("players/{id}/delete")
     public ResponseEntity<Player> deletePlayer(@PathVariable("id") Integer id) {
-        if (!repository.existsById(id)) {
+        if (!playerRepository.existsById(id)) {
             return new ResponseEntity<Player>(HttpStatus.NO_CONTENT);
         }
-        repository.deleteById(id);
+        playerRepository.deleteById(id);
         return new ResponseEntity<Player>(HttpStatus.OK);
     }
 }

@@ -5,55 +5,63 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rva.jpa.Team;
+import rva.repositories.PlayerRepository;
 import rva.repositories.TeamRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @RestController
 public class TeamController {
 
     @Autowired
-    private TeamRepository repository;
+    private TeamRepository teamRepository;
+
+    @Autowired
+    private PlayerRepository playerRepository;
 
     @GetMapping("teams/all")
     public List<Team> getTeamsAll() {
-        return repository.findAll();
+        return teamRepository.findAll();
     }
 
     @GetMapping("teams/{id}")
     public Team getTeamById(@PathVariable("id") Integer id) {
-        return repository.getById(id);
+        return teamRepository.getById(id);
     }
 
     @GetMapping("teams/search/{name}")
     public List<Team> getTeamsByName(@PathVariable("name") String name) {
-        return repository.findByNameContainingIgnoreCase(name);
+        return teamRepository.findByNameContainingIgnoreCase(name);
     }
 
     @PostMapping("teams/insert")
     public ResponseEntity<Team> insertTeam(@RequestBody Team team) {
-        if (repository.existsById(team.getId())) {
+        if (teamRepository.existsById(team.getId())) {
             return new ResponseEntity<Team>(HttpStatus.CONFLICT);
         }
-        repository.save(team);
+        teamRepository.save(team);
         return new ResponseEntity<Team>(HttpStatus.OK);
     }
 
     @PutMapping("teams/update")
     public ResponseEntity<Team> updateTeam(@RequestBody Team team) {
-        if (!repository.existsById(team.getId())) {
+        if (!teamRepository.existsById(team.getId())) {
             return new ResponseEntity<Team>(HttpStatus.NO_CONTENT);
         }
-        repository.save(team);
+        teamRepository.save(team);
         return new ResponseEntity<Team>(HttpStatus.OK);
     }
 
+    @Transactional
     @DeleteMapping("teams/{id}/delete")
     public ResponseEntity<Team> deleteTeam(@PathVariable("id") Integer id) {
-        if (!repository.existsById(id)) {
+        if (!teamRepository.existsById(id)) {
             return new ResponseEntity<Team>(HttpStatus.NO_CONTENT);
         }
-        repository.deleteById(id);
+        // First delete all players that play for forwarded team.
+        playerRepository.deleteAllByTeam_Id(id);
+        teamRepository.deleteById(id);
         return new ResponseEntity<Team>(HttpStatus.OK);
     }
 }
