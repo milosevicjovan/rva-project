@@ -1,5 +1,6 @@
 package rva.jpa;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
@@ -32,6 +33,7 @@ public class Team implements Serializable {
 	private String place;
 
 	//bi-directional many-to-one association to Player
+	@JsonIgnore
 	@OneToMany(mappedBy= "team")
 	private List<Player> players;
 

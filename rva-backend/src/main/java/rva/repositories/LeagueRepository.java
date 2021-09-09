@@ -6,5 +6,5 @@ import rva.jpa.League;
 import java.util.List;
 
 public interface LeagueRepository extends JpaRepository<League, Integer> {
-    public List<League> findByNameContainingIgnoreCase(String name);
+    List<League> findByNameContainingIgnoreCase(String name);
 }
