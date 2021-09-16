@@ -9,6 +9,7 @@ import rva.repositories.PlayerRepository;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 public class PlayerController {
 

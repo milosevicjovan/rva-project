@@ -11,6 +11,7 @@ import rva.repositories.TeamRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 public class TeamController {
 

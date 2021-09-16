@@ -11,7 +11,7 @@ import rva.repositories.PlayerRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 
-
+@CrossOrigin
 @RestController
 public class NationalityController {
 

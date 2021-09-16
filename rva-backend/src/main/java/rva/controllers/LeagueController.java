@@ -14,6 +14,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+@CrossOrigin
 @RestController
 public class LeagueController {
 
@@ -65,6 +66,8 @@ public class LeagueController {
         if (!leagueRepository.existsById(id)) {
             return new ResponseEntity<League>(HttpStatus.NO_CONTENT);
         }
+
+        // Next block of code could also be removed if cascade delete is enabled
 
         // First delete all players that play in forwarded league.
         List<Team> teams = teamRepository.findAllByLeague_Id(id);
